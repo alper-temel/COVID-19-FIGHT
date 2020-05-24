@@ -1,0 +1,377 @@
+import turtle
+import random
+import time
+
+x = random.randint(370, 450)
+y = random.randint(-370, 370)
+
+wn = turtle.Screen()
+wn.bgcolor("black")
+wn.title("Kill the F*cking Corona")
+wn.setup(800, 800)
+wn.tracer(0)
+
+
+oyuncu = turtle.Turtle()
+oyuncu.shape("triangle")
+oyuncu.speed(0)
+oyuncu.penup()
+oyuncu.goto(-380, 0)
+oyuncu.color("white")
+
+
+
+dusman = turtle.Turtle()
+dusman.shape("turtle")
+dusman.rt(180)
+dusman.color("blue")
+dusman.penup()
+dusman.speed(0)
+dusman.goto(x, y)
+
+
+skor = 0
+pen = turtle.Turtle()
+pen.hideturtle()
+pen.goto(-350, 350)
+pen.color("white")
+pen.write("Skor: 0", align = "center", font = ("Arial", 16))
+
+
+
+live = 3
+can = turtle.Turtle()
+can.hideturtle()
+can.goto(-350, 330)
+can.color("white")
+can.write("Kalan Can: 3", align = "center", font = ("Arial", 16))
+
+def dusman_git():
+    
+    x = dusman.xcor()
+    x -= 1
+    dusman.setx(x)
+
+
+def move_up():
+    y = oyuncu.ycor()
+    y += 30
+    oyuncu.sety(y)
+    
+def move_down():
+    y = oyuncu.ycor()
+    y -= 30
+    oyuncu.sety(y)
+    
+def move_left():
+    x = oyuncu.xcor()
+    x += -30
+    oyuncu.setx(x)
+
+def move_right():
+    x = oyuncu.xcor()
+    x += 30
+    oyuncu.setx(x)
+
+class Enemy(turtle.Turtle):
+    def __init__(self, shape, color, startx, starty):
+        turtle.Turtle.__init__(self, shape = shape)
+        self.color(color)
+        self.penup()
+        self.goto(startx, starty)
+
+    def move(self):
+        x = self.xcor()
+        x -= 0.5
+        self.setx(x)
+
+        if self.xcor() < -390:
+            self.hideturtle()
+            self.goto(random.randint(420, 900), random.randint(-370, 370))
+            self.showturtle()
+        
+
+
+
+enemy = Enemy("turtle", "purple", x, y)
+enemy.rt(180)
+dusman_1 = Enemy("turtle", "green", x, y)
+dusman_1.rt(180)
+dusman_2 = Enemy("turtle", "green", x, y)
+dusman_2.rt(180)
+dusman_3 = Enemy("turtle", "green", x, y)
+dusman_3.rt(180)
+dusman_3.fillcolor("red")
+dusman_4 = Enemy("turtle", "green", x, y)
+dusman_4.rt(180)
+dusman_5 = Enemy("turtle", "green", x, y)
+dusman_5.rt(180)
+
+class Fire(turtle.Turtle):
+    def __init__(self, spriteshape, color, startx, starty):
+        turtle.Turtle.__init__(self, shape = spriteshape)
+        self.color(color)
+        self.shapesize(stretch_wid = 0.3, stretch_len = 0.4)
+        self.speed = 20
+        self.speed_2 = -5
+        self.status = "ready"
+        self.penup()
+        self.goto(-1000, 1000)
+        self.skor = skor
+        self.live = live
+
+
+    def fire(self):
+        if self.status == "ready":
+            self.goto(oyuncu.xcor(), oyuncu.ycor())
+            self.status = "firing"
+
+    def enemy_fire(self):
+        if self.status == "ready":
+            self.goto(dusman_3.xcor(), dusman_3.ycor())
+            self.status = "firing"
+
+    def move_enemy(self):
+        if self.status == "ready":
+            self.goto(-1500, 1500)
+        if self.status == "firing":
+            self.fd(self.speed_2)
+        if self.xcor() < -390:
+            self.status = "ready"
+
+        if self.distance(oyuncu) < 15:
+            self.status = "ready"
+            oyuncu.goto(-370, 0)
+            self.live -= 1
+            can.clear()
+            can.write("Kalan Can: {}".format(self.live), align = "center", font = ("Arial", 16))
+
+            if self.live <= 0:
+                #self.live = 0
+                oyuncu.hideturtle()
+                time.sleep(3)
+
+                pen.clear()
+                pen.color("red")
+                pen.goto(0, 0)
+                pen.write("DEFEATED AGAINST COVID-19 YOU FOOL !!!!! \n YOUR FUCKED UP SCORE: {}".format(fire.skor), align = "center", font = ("Arial", 30))
+
+                time.sleep(5)
+
+                pen.penup()
+                pen.goto(-350, 350)
+                pen.color("white")
+
+                fire.skor = 0
+                oyuncu.showturtle()
+                oyuncu.goto(-380, 0)
+                enemy.goto(y = -250, x = 420)
+                dusman.goto(y = -350, x = 420)
+                dusman_1.goto(y = 320, x =420)
+                dusman_2.goto(y = 290, x = 420)
+                dusman_3.goto(y = 260, x = 420)
+                dusman_4.goto(y = 230, x = 420)
+                dusman_5.goto(y = 200, x = 420)
+                
+                can.clear()
+                can.write("Kalan Can: 3", align = "center", font = ("Arial", 16))
+                self.live = 3
+                fire.skor = 0
+                pen.clear()
+                pen.write("Skor: {}".format(fire.skor), align = "center", font = ("Arial", 16))
+            
+            else:
+                can.clear()
+                can.write("Kalan Can: {}".format(self.live), align = "center", font = ("Arial", 16))             
+        
+    def move(self):
+
+        if self.status == "ready":
+            self.goto(-1000, 1000)
+        if self.status == "firing":
+            self.fd(self.speed)
+        if self.xcor() > 390:
+            self.status = "ready"
+
+        if self.distance(dusman) < 20:
+            self.status = "ready"
+            dusman.goto(random.randint(0, 370), random.randint(-370, 370))
+            self.skor += 10
+            pen.clear()
+            pen.write("Skor: {}".format(self.skor), align = "center", font = ("Arial", 16))
+
+        
+        if self.distance(enemy) < 20:
+            self.status = "ready"
+            enemy.goto(random.randint(0, 370), random.randint(-370, 370))
+            self.skor += 10
+            pen.clear()
+            pen.write("Skor: {}".format(self.skor), align = "center", font = ("Arial", 16))
+
+        
+        if self.distance(dusman_1) < 20:
+            self.status = "ready"
+            dusman_1.goto(random.randint(370, 600), random.randint(-370, 370))
+            self.skor += 10
+            pen.clear()
+            pen.write("Skor: {}".format(self.skor), align = "center", font = ("Arial", 16))
+
+
+        if self.distance(dusman_2) < 20:
+            self.status = "ready"
+            dusman_2.goto(random.randint(370, 450), random.randint(-370, 370))
+            self.skor += 10
+            pen.clear()
+            pen.write("Skor: {}".format(self.skor), align = "center", font = ("Arial", 16))
+
+        
+        if self.distance(dusman_3) < 20:
+            self.status = "ready"
+            dusman_3.goto(random.randint(370, 550), random.randint(-370, 370))
+            self.skor += 10
+            pen.clear()
+            pen.write("Skor: {}".format(self.skor), align = "center", font = ("Arial", 16))
+
+        if self.distance(dusman_4) < 20:
+            self.status = "ready"
+            dusman_4.goto(random.randint(370, 429), random.randint(-370, 370))
+            self.skor += 10
+            pen.clear()
+            pen.write("Skor: {}".format(self.skor), align = "center", font = ("Arial", 16))
+
+
+        if self.distance(dusman_5) < 20:
+            self.status = "ready"
+            dusman_5.goto(random.randint(370, 500), random.randint(-370, 370))
+            self.skor += 10
+            pen.clear()
+            pen.write("Skor: {}".format(self.skor), align = "center", font = ("Arial", 16))
+    
+        if self.skor == 1000:
+            pen.clear()
+            pen.color("red")
+            pen.goto(0, 0)
+            pen.write("YOU FUCKED! YOU KILLED FUCKING CORONAVIRUS WELL DONE BOY !!!! \n +100 BONUS KEEP GOING", align = "center", font = ("Arial", 20))
+            time.sleep(3)
+            self.skor += 100
+            pen.clear()
+            pen.penup()
+            pen.color("white")
+            pen.goto(-350, 350)
+            pen.write("Skor: {}".format(self.skor), align = "center", font = ("Arial", 16))
+
+
+fire = Fire("circle", "red", oyuncu.xcor(), oyuncu.ycor())
+enemy_fire = Fire("circle", "blue", dusman_3.xcor(), dusman_3.ycor())
+
+wn.listen()
+wn.onkeypress(move_up, "Up")
+wn.onkeypress(move_down, "Down")
+wn.onkeypress(move_left, "Left")
+wn.onkeypress(move_right, "Right")
+wn.onkeypress(fire.fire, "space")
+#wn.onkeypress(enemy_fire.enemy_fire, "g")
+
+
+while True:
+
+    wn.update()
+    dusman_git()
+    fire.move()
+    enemy.move()
+    dusman_1.move()
+    dusman_2.move()
+    dusman_3.move()
+    dusman_4.move()
+    dusman_5.move()
+    enemy_fire.enemy_fire()
+    enemy_fire.move_enemy()
+    
+
+
+    if enemy.xcor() == -380 or dusman.xcor() == -380 or dusman_1.xcor() == -380 or dusman_2.xcor() == -380 or dusman_3.xcor() == -380 or (dusman_4.xcor() == -380) or (dusman_5.xcor() == -380):
+        live -= 1
+        if live <= 0:
+            live = 0
+            oyuncu.hideturtle()
+            time.sleep(3)
+
+            pen.clear()
+            pen.color("red")
+            pen.goto(0, 0)
+            pen.write("DEFEATED AGAINST COVID-19 YOU FOOL !!!!! \n YOUR FUCKED UP SCORE: {}".format(fire.skor), align = "center", font = ("Arial", 30))
+
+            time.sleep(5)
+
+            pen.penup()
+            pen.goto(-350, 350)
+            pen.color("white")
+
+            fire.skor = 0
+            oyuncu.showturtle()
+            oyuncu.goto(-380, 0)
+            enemy.goto(y = -250, x = 420)
+            dusman.goto(y = -350, x = 420)
+            dusman_1.goto(y = 320, x =420)
+            dusman_2.goto(y = 290, x = 420)
+            dusman_3.goto(y = 260, x = 420)
+            dusman_4.goto(y = 230, x = 420)
+            dusman_5.goto(y = 200, x = 420)
+            
+            can.clear()
+            can.write("Kalan Can: 3", align = "center", font = ("Arial", 16))
+            live = 3
+            fire.skor = 0
+            pen.clear()
+            pen.write("Skor: {}".format(fire.skor), align = "center", font = ("Arial", 16))
+
+        else:
+            can.clear()
+            can.write("Kalan Can: {}".format(live), align = "center", font = ("Arial", 16))
+
+
+
+    if oyuncu.distance(enemy) < 23 or oyuncu.distance(dusman) < 23 or oyuncu.distance(dusman_1) < 23 or oyuncu.distance(dusman_2) < 23 or oyuncu.distance(dusman_3) < 23 or oyuncu.distance(dusman_4) < 23 or oyuncu.distance(dusman_5) < 23:
+        oyuncu.goto(-370, 0)
+        live -= 1
+        if live <= 0:
+            live = 0
+            oyuncu.hideturtle()
+            time.sleep(3)
+
+            pen.clear()
+            pen.color("red")
+            pen.goto(0, 0)
+            pen.write("DEFEATED AGAINST COVID-19 YOU FOOL !!!!! \n YOUR FUCKED UP SCORE: {}".format(fire.skor), align = "center", font = ("Arial", 30))
+
+            time.sleep(5)
+
+            pen.penup()
+            pen.goto(-350, 350)
+            pen.color("white")
+
+            fire.skor = 0
+            oyuncu.showturtle()
+            oyuncu.goto(-380, 0)
+            enemy.goto(y = -250, x = 420)
+            dusman.goto(y = -350, x = 420)
+            dusman_1.goto(y = 320, x =420)
+            dusman_2.goto(y = 290, x = 420)
+            dusman_3.goto(y = 260, x = 420)
+            dusman_4.goto(y = 230, x = 420)
+            dusman_5.goto(y = 200, x = 420)
+            
+            can.clear()
+            can.write("Kalan Can: 3", align = "center", font = ("Arial", 16))
+            live = 3
+            fire.skor = 0
+            pen.clear()
+            pen.write("Skor: {}".format(fire.skor), align = "center", font = ("Arial", 16))
+        
+        
+        else:
+            can.clear()
+            can.write("Kalan Can: {}".format(live), align = "center", font = ("Arial", 16))
+        
+
+
